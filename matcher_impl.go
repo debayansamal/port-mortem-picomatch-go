@@ -69,16 +69,39 @@ func MatchBase(input string, globOrRegex interface{}, options *Options, posix bo
 }
 
 func IsMatch(str string, patterns interface{}, options *Options) (bool, error) {
+	opts := options
+	if opts == nil {
+		opts = &Options{}
+	}
+
 	switch p := patterns.(type) {
 	case string:
-		regex, err := MakeRe(p, options)
+		pattern := p
+		negated := false
+		if strings.HasPrefix(pattern, "!") && !opts.Nonegate {
+			negated = true
+			pattern = pattern[1:]
+		}
+
+		input := str
+		if (opts.MatchBase || opts.Basename) && !strings.Contains(pattern, "/") {
+			input = Basename(str, opts.Windows)
+		}
+
+		regex, err := MakeRe(pattern, opts)
 		if err != nil {
 			return false, err
 		}
-		return regex.MatchString(str), nil
+
+		matched := regex.MatchString(input)
+		if negated {
+			return !matched, nil
+		}
+		return matched, nil
+
 	case []string:
 		for _, pattern := range p {
-			ok, err := IsMatch(str, pattern, options)
+			ok, err := IsMatch(str, pattern, opts)
 			if err != nil {
 				return false, err
 			}

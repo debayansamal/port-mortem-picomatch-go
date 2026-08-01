@@ -460,7 +460,7 @@ func parseLegacy(input string, options *Options) (ParseState, error) {
 	if opts.Dot {
 		qmarkNoDot = QMARK
 	}
-	star := STAR
+	star := nodot + STAR
 	if opts.Bash {
 		star = globstar(opts)
 	}
