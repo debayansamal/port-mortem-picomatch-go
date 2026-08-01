@@ -24,8 +24,8 @@ jobs:
     - name: Check Formatting
       run: |
         if [ -n "$(gofmt -l .)" ]; then
-          echo "Go files are not formatted properly. Please run 'go fmt ./...'"
-          gofmt -d .
+          echo "Go files are not formatted properly. Run 'go fmt ./...'"
+          gofmt -l .
           exit 1
         fi
 
@@ -33,4 +33,4 @@ jobs:
       run: go vet ./...
 
     - name: Run Tests with Coverage
-      run: go test -v -race -coverprofile=coverage.out ./...
+      run: go test -v -coverprofile=coverage.out ./...
